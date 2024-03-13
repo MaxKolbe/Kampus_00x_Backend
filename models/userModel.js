@@ -1,5 +1,4 @@
 const mongoose = require("mongoose")
-const passportLocalMongoose = require("passport-local-mongoose")
 
 const userSchema = mongoose.Schema({
     username:{
@@ -20,24 +19,23 @@ const userSchema = mongoose.Schema({
     },
     email:{
         type: String,
-        requird: true
+        requird: true,
+        unique: true
     },
     age:{
         type: String,
         requird: true
     }, 
+    isAdmin:{
+        type: Boolean,
+        default: true
+    },
     resetPasswordToken:{
         type: String
     },
     resetPasswordExpires:{ 
         type: Date
     }
-})
-
-userSchema.plugin(passportLocalMongoose, { usernameField: 'email' })// Automatically handles hashing and salting of passwords
-// and adds the following properties to the user object:
-//   - password
-//   - salt
-//   - hash
+}, { timestamps: true })
 
 module.exports = mongoose.model("users", userSchema)

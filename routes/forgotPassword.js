@@ -155,10 +155,4 @@ router.post("/resetPassword/:token", async (req, res) => {
     }
 });
 
-// router.get("/data", (req, res)=>{
-//   const sessionData = req.session;
-//   console.log(sessionData.passport.user)
-//   res.send(sessionData)
-// }) 
-
 module.exports = router
