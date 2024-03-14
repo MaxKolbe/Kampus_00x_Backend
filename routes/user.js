@@ -1,9 +1,10 @@
 const express = require("express")
 const bcrypt = require("bcrypt")
+const mongoose = require("mongoose")
 const jwt = require("jsonwebtoken")
 const userModel = require("../models/userModel")
 const router = express.Router()
-const {verifyCred} = require("../middleware/verifyCred")
+const {verifyCred, verifyCredAndAuthorization} = require("../middleware/verifyCred")
 
 router.use(express.urlencoded({extended: false}))
 
@@ -51,9 +52,28 @@ router.post('/logout', (req, res) => {
 });
 
 //Handles user update request
-router.put("/:id", verifyCred, (req, res)=>{
-    
+router.put("/:id", verifyCredAndAuthorization, async (req, res)=>{
+    if(req.body.password){
+       req.body.password = await bcrypt.hash(req.body.password, 10)
+    }
+    try{
+        await userModel.findByIdAndUpdate(req.params.id, {
+            $set: req.body
+        }, {new: true})
+        res.status(201).json({message: "User updated successfully"})
+    }catch(err){
+        res.status(500).json({message: `Error in updated user: ${err}`})
+    }
 })
+
+// router.get("/:id", verifyCredAndAuthorization, (req, res)=>{
+//     res.send("allgood")
+// })
+
+// router.get("/:id", verifyCred, (req, res)=>{
+//     res.send("allgood")
+//     console.log(req.user)
+// })
 
 module.exports = router
 
