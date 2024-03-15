@@ -4,7 +4,7 @@ const mongoose = require("mongoose")
 const jwt = require("jsonwebtoken")
 const userModel = require("../models/userModel")
 const router = express.Router()
-const {verifyCred, verifyCredAndAuthorization} = require("../middleware/verifyCred")
+const {verifyCred, verifyCredAndAuthorization, verifyCredAndAdmin} = require("../middleware/verifyCred")
 
 router.use(express.urlencoded({extended: false}))
 
@@ -66,14 +66,63 @@ router.put("/:id", verifyCredAndAuthorization, async (req, res)=>{
     }
 })
 
-// router.get("/:id", verifyCredAndAuthorization, (req, res)=>{
-//     res.send("allgood")
-// })
+//Handles delete user request
+router.delete("/:id", verifyCredAndAuthorization, async (req,res)=>{
+    try{
+        await userModel.findByIdAndDelete(req.params.id)
+        res.status(200).json({message: `User deleted successfully`})
+    }catch(err){
+        res.status(500).json({message:`error: ${err}`})
+    }
+})
 
-// router.get("/:id", verifyCred, (req, res)=>{
-//     res.send("allgood")
-//     console.log(req.user)
-// })
+//Handles GET user request
+router.get("/find/:id", verifyCredAndAdmin, async (req,res)=>{
+    try{
+        const user = await userModel.findById(req.params.id)
+        const {password, ...others } = user._doc
+        res.status(200).json(others)
+    }catch(err){
+        res.status(500).json({message:`error: ${err}`})
+    }
+})  
+
+//Handles GET All Users request
+router.get("/find", verifyCredAndAdmin, async (req,res)=>{
+    const query = req.query.new
+    try{  
+        const users = query ? await userModel.find().sort({id: -1}).limit(5) : await userModel.find()
+        res.status(200).json(users)
+    }catch(err){
+        res.status(500).json({message:`error: ${err}`})
+    }
+})  
+
+//Handles GET All Users Statistics 
+// router.get("/stats", verifyCredAndAdmin, async (req,res)=>{
+//     const date = new Date()
+//     const lastYear = new Date(date.setFullYear(date.getFullYear() -1 ))
+
+//     try{
+//         const data = await userModel.aggregate([
+//             {$match: {createdAt: {$gte: lastYear}}},
+//             {
+//                 $project:{
+//                     month: {$month: "$createdAt"}
+//                 }
+//             },
+//             {
+//                 $group:{
+//                     _id: "$month",
+//                     total: {$sum: 1}
+//                 }
+//             }
+//         ])
+//         res.status(200).json(data)
+//     }catch(err){
+//         res.status(500).json({message:`error: ${err}`})
+//     }
+// })  
 
 module.exports = router
 

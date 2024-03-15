@@ -1,4 +1,6 @@
 const jwt = require("jsonwebtoken")
+const mongoose = require("mongoose")
+const userModel = require("../models/userModel")
 require("dotenv").config()
 
 const verifyCred = (req, res, next)=>{
@@ -19,7 +21,7 @@ const verifyCred = (req, res, next)=>{
 
 const verifyCredAndAuthorization = (req, res, next) =>{
   verifyCred(req, res, ()=>{
-    if(req.user.id === req.params.id || req.user.isAdmin){
+    if(req.user.id === req.params.id){
       next()
     }else{
       res.status(400).json({message: `User unidentified or isNotAdmin`});
@@ -28,8 +30,9 @@ const verifyCredAndAuthorization = (req, res, next) =>{
 }
 
 const verifyCredAndAdmin= (req, res, next) =>{
-  verifyCred(req, res, ()=>{
-    if(req.user.isAdmin){
+  verifyCred(req, res, async ()=>{
+    const user = await userModel.findById(req.user.id)
+    if(user.isAdmin){
       next()
     }else{
       res.status(400).json({message: `User unidentified or isNotAdmin`});
