@@ -1,5 +1,5 @@
 const express = require("express")
-const productModel = require("../models/productModel")
+const cartModel = require("../models/cartModel")
 const router = express.Router()
 const {verifyCred, verifyCredAndAuthorization, verifyCredAndAdmin} = require("../middleware/verifyCred")
 

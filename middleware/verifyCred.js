@@ -8,7 +8,7 @@ const verifyCred = (req, res, next)=>{
   if(token){
     jwt.verify(token, process.env.secret, (err, user)=>{
       if(err){
-        res.status(400).json({message: `User's Toen/cred is not valid. Error in verifying: ${err}`});
+        res.status(400).json({message: `Error in verifying Token/Cred: ${err}`});
       }else{
         req.user = user
         next()

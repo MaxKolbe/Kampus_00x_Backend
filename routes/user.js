@@ -1,6 +1,5 @@
 const express = require("express")
 const bcrypt = require("bcrypt")
-const mongoose = require("mongoose")
 const jwt = require("jsonwebtoken")
 const userModel = require("../models/userModel")
 const router = express.Router()
@@ -62,7 +61,7 @@ router.put("/:id", verifyCredAndAuthorization, async (req, res)=>{
         }, {new: true})
         res.status(201).json({message: "User updated successfully"})
     }catch(err){
-        res.status(500).json({message: `Error in updated user: ${err}`})
+        res.status(500).json({message: `Error in updating user: ${err}`})
     }
 })
 
@@ -72,7 +71,7 @@ router.delete("/:id", verifyCredAndAuthorization, async (req,res)=>{
         await userModel.findByIdAndDelete(req.params.id)
         res.status(200).json({message: `User deleted successfully`})
     }catch(err){
-        res.status(500).json({message:`error: ${err}`})
+        res.status(500).json({message:`Error in deleting user: ${err}`})
     }
 })
 
@@ -83,7 +82,7 @@ router.get("/find/:id", verifyCredAndAdmin, async (req,res)=>{
         const {password, ...others } = user._doc
         res.status(200).json(others)
     }catch(err){
-        res.status(500).json({message:`error: ${err}`})
+        res.status(500).json({message:`Error in getting user: ${err}`})
     }
 })  
 
@@ -94,7 +93,7 @@ router.get("/find", verifyCredAndAdmin, async (req,res)=>{
         const users = query ? await userModel.find().sort({id: -1}).limit(5) : await userModel.find()
         res.status(200).json(users)
     }catch(err){
-        res.status(500).json({message:`error: ${err}`})
+        res.status(500).json({message:`Error in getting all users: ${err}`})
     }
 })  
 
