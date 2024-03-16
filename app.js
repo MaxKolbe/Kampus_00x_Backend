@@ -3,6 +3,7 @@ const mongoose = require("mongoose")
 const cookieParser = require("cookie-parser")
 const forgotPassword = require("./routes/forgotPassword")
 const userRoute = require("./routes/user")
+const producRoute = require("./routes/product")
 
 require("dotenv").config()
 
@@ -22,6 +23,7 @@ mongoose.connect(process.env.url)
 })
 
 app.use("/auth", userRoute)
+app.use("/product", producRoute)
 app.use("/forgotPassword", forgotPassword)
 
 app.get("/", (req, res)=>{
