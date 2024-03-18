@@ -5,69 +5,57 @@ const {verifyCred, verifyCredAndAuthorization, verifyCredAndAdmin} = require("..
 
 router.use(express.urlencoded({extended: false}))
 
-//Create Product
-router.post("/", verifyCredAndAdmin, async (req, res)=>{
-    const newProduct = new productModel(req.body)
+//Create Cart
+router.post("/", verifyCred, async (req, res)=>{
+    const newCart = new cartModel(req.body)
     try{
-        const savedProduct = await newProduct.save()
-        res.status(200).json(savedProduct)
+        const savedCart = await newCart.save()
+        res.status(200).json(savedCart)
     }catch(err){
-        res.status(500).json({message: `Error in creating product: ${err}`})
+        res.status(500).json({message: `Error in creating Cart: ${err}`})
     }
 })
 
-//Handles Product Update request
-router.put("/:id", verifyCredAndAdmin, async (req, res)=>{
+//Handles Cart Update request
+router.put("/:id", verifyCredAndAuthorization, async (req, res)=>{
     try{
-        await productModel.findByIdAndUpdate(req.params.id, {
+        await cartModel.findByIdAndUpdate(req.params.id, {
             $set: req.body
         }, {new: true})
-        res.status(201).json({message: "Product updated successfully"})
+        res.status(201).json({message: "Cart updated successfully"})
     }catch(err){
-        res.status(500).json({message: `Error in updating Product: ${err}`})
+        res.status(500).json({message: `Error in updating Cart: ${err}`})
     }
 })
 
-//Handles Delete Product request
-router.delete("/:id", verifyCredAndAdmin, async (req,res)=>{
+//Handles Delete Cart request
+router.delete("/:id", verifyCredAndAuthorization, async (req,res)=>{
     try{
-        await productModel.findByIdAndDelete(req.params.id)
-        res.status(200).json({message: `Product deleted successfully`})
+        await cartModel.findByIdAndDelete(req.params.id)
+        res.status(200).json({message: `Cart deleted successfully`})
     }catch(err){
-        res.status(500).json({message:`Error in deleting product: ${err}`})
+        res.status(500).json({message:`Error in deleting Cart: ${err}`})
     }
 })
 
-//Handles GET Product request
-router.get("/find/:id", async (req,res)=>{
+//Handles GET user Cart request
+router.get("/find/:userId", verifyCredAndAuthorization, async (req,res)=>{
     try{
-        const product = await productModel.findById(req.params.id)
-        res.status(200).json(product)
+        const cart = await cartModel.findOne({_id: req.params.id})
+        res.status(200).json(cart)
     }catch(err){
-        res.status(500).json({message:`Error in getting product: ${err}`})
+        res.status(500).json({message:`Error in getting Cart: ${err}`})
     }
 })  
 
-//Handles GET All Products request
-router.get("/find", verifyCredAndAdmin, async (req,res)=>{
-    const qNew = req.query.new
-    const qCategory = req.query.category
-    try{  
-        let products
-
-        if(qNew){
-            products = await productModel.find().sort({createdAt: -1}).limit(5)
-        }else if(qCategory){
-            products = await productModel.find({categories:{
-                $in: [qCategory]
-            }})
-        }else{
-            products = await productModel.find()
-        }
-
-        res.status(200).json(products)
+//Handles GET All Carts request
+router.get("/", verifyCredAndAdmin, async (req,res)=>{
+  
+    try{
+        const carts = await cartModel.find()
+        res.status(200).json(carts)
     }catch(err){
-        res.status(500).json({message:`Error in getting all products: ${err}`})
+        res.status(500).json({message:`Error in getting all Carts: ${err}`})
     }
 })  
 
